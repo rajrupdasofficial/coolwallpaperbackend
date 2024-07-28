@@ -10,7 +10,6 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-
     permissions:
       id-token: write # Needed for auth with Deno Deploy
       contents: read # Needed to clone the repository
@@ -23,11 +22,13 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-      - name: Build step
-        run: deno task dev
+
+      - name: Build the Application
+        run: deno task build
 
       - name: Deploy to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: "coolwallpaper4329978" # Replace with your actual project name
-          entrypoint: "main.ts"
+          entrypoint: "main.ts" # Replace with your actual entry point file
+          # token: ${{ secrets.DENO_DEPLOY_TOKEN }} # Use a secret for your Deno Deploy token
