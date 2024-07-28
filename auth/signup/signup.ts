@@ -3,6 +3,7 @@ import { hash } from "https://deno.land/x/scrypt@v4.2.1/mod.ts";
 import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 
 interface UserData {
+  uid: string;
   username: string;
   email: string;
   password: string;
@@ -40,11 +41,14 @@ const userSignup = async (ctx: Context) => {
     // Hash password
     const hashedPassword = await hash(password);
     // Create user data
+    const uid = crypto.randomUUID();
     const userData: UserData = {
+      uid,
       username,
       email,
       password: hashedPassword,
     };
+
     // Store user data
     await kv.set(["users", email], userData);
     ctx.response.status = 201;
