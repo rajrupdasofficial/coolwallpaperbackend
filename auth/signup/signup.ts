@@ -1,54 +1,46 @@
 import { Context } from "https://deno.land/x/oak@v16.1.0/mod.ts";
-import { hash } from "jsr:@denorg/scrypt@4.4.4";
+import { hash } from "https://deno.land/x/scrypt@v4.2.1/mod.ts";
+
+interface UserData {
+  username: string;
+  email: string;
+  password: string;
+}
 
 const userSignup = async (ctx: Context) => {
-  const body = ctx.request.body;
-  const responsebody = await body.json();
-
-  const signupbody = {
-    username: responsebody.username,
-    email: responsebody.email,
-    password: responsebody.password,
-  };
+  const body = await ctx.request.body.json();
+  const { username, email, password } = body;
 
   try {
     const kv = await Deno.openKv();
 
-    // Check if username or email already exists
-    const existingUsername = await kv.get(["users", signupbody.username]);
-    const existingEmail = await kv.get(["emails", signupbody.email]);
-
-    // Log the existing values for debugging
-    console.log("Existing Username:", existingUsername.value);
-    console.log("Existing Email:", existingEmail.value);
-
-    if (existingUsername.value !== null || existingEmail.value !== null) {
+    // Check if email already exists
+    const existingEmail = await kv.get<UserData>(["users", email]);
+    if (existingEmail.value !== null && existingEmail.value !== undefined) {
       ctx.response.status = 409;
-      ctx.response.body = {
-        message: "Email or username already exists in the database",
-      };
+      ctx.response.body = { message: "Email already exists" };
       return;
     }
 
-    const hashPassword = await hash(signupbody.password);
-    const userData = {
-      username: signupbody.username,
-      email: signupbody.email,
-      password: hashPassword,
+    // Hash password
+    const hashedPassword = await hash(password);
+
+    // Create user data
+    const userData: UserData = {
+      username,
+      email,
+      password: hashedPassword,
     };
 
-    // Store user data and email mapping
-    await Promise.all([
-      kv.set(["users", signupbody.username], userData),
-      kv.set(["emails", signupbody.email], signupbody.username),
-    ]);
+    // Store user data
+    await kv.set(["users", email], userData);
 
     ctx.response.status = 201;
     ctx.response.body = { message: "User created successfully" };
   } catch (error) {
-    console.log("Error in user sign up", error);
+    console.error("Error in user signup:", error);
     ctx.response.status = 500;
-    ctx.response.body = { message: `Internal server error ${error}` };
+    ctx.response.body = { message: "Internal server error" };
   }
 };
 
