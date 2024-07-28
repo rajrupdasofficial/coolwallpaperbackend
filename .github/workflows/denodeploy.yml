@@ -22,13 +22,12 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-
       - name: Build step
-        run: "deno task build"
+        run: deno task dev
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: coolwallpaper4329978
-          entrypoint: "build/mod.ts"
-          root: "."
+
+          project: "coolwallpaper4329978"
+          entrypoint: "main.ts"
