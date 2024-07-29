@@ -1,7 +1,10 @@
+// userSignin.ts
 import { Context } from "https://deno.land/x/oak@v16.1.0/mod.ts";
 import { verify } from "https://deno.land/x/scrypt@v4.2.1/mod.ts";
-import { create, getNumericDate } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
+// import { generateJwt } from "./lib/jwt.ts"; // Import the new JWT function
 import "@std/dotenv/load";
+import generateJwt from "../../lib/jwt.ts";
+
 interface UserData {
   uid: string;
   username: string;
@@ -15,21 +18,21 @@ const userSignin = async (ctx: Context) => {
   if (!apikeyheader) {
     ctx.response.status = 404;
     ctx.response.body = { message: "Api key is missing" };
-    return; // Add this return statement
+    return;
   }
 
   const apikeyfromenv = Deno.env.get("API_SECUIRTY_KEY");
   if (apikeyfromenv !== apikeyheader) {
     ctx.response.status = 401;
     ctx.response.body = { message: "Unauthorized access is not allowed" };
-    return; // Add this return statement
+    return;
   }
+
   const body = await ctx.request.body.json();
   const { email, password } = body;
 
   try {
     const kv = await Deno.openKv();
-    // Get user data by email
     const result = await kv.get<UserData>(["users", email]);
 
     if (result.value === null || result.value === undefined) {
@@ -39,32 +42,18 @@ const userSignin = async (ctx: Context) => {
     }
 
     const userData: UserData = result.value;
-
-    // Verify password
     const isPasswordValid = await verify(password, userData.password);
+
     if (!isPasswordValid) {
       ctx.response.status = 401;
       ctx.response.body = { message: "Invalid credentials" };
       return;
     }
 
-    // Password is valid, user is authenticated
-    // Generate JWT token
-    const key = await crypto.subtle.generateKey(
-      { name: "HMAC", hash: "SHA-512" },
-      true,
-      ["sign", "verify"]
-    );
-
-    const jwt = await create(
-      { alg: "HS512", typ: "JWT" },
-      {
-        iss: "coolwallpaperapp",
-        exp: getNumericDate(60 * 60), // 1 hour from now
-        email: userData.email,
-        uid: userData.uid,
-      },
-      key
+    // Use the new generateJwt function
+    const jwt = await generateJwt(
+      { email: userData.email, uid: userData.uid },
+      60 * 60 // Token expiration set to 1 hour
     );
 
     ctx.response.status = 200;
