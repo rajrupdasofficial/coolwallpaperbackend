@@ -1,8 +1,7 @@
 import { Context } from "https://deno.land/x/oak@v16.1.0/mod.ts";
 import { verify } from "https://deno.land/x/scrypt@v4.2.1/mod.ts";
-import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 import { create, getNumericDate } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
-
+import "@std/dotenv/load";
 interface UserData {
   uid: string;
   username: string;
@@ -11,21 +10,20 @@ interface UserData {
 }
 
 const userSignin = async (ctx: Context) => {
-  const env = await load();
   const apikeyheader = ctx.request.headers.get("x-api-key");
+
   if (!apikeyheader) {
-    ctx.response.status = 400;
+    ctx.response.status = 404;
     ctx.response.body = { message: "Api key is missing" };
-    return;
+    return; // Add this return statement
   }
 
-  const apikeyfromenv = env["API_SECUIRTY_KEY"];
+  const apikeyfromenv = Deno.env.get("API_SECUIRTY_KEY");
   if (apikeyfromenv !== apikeyheader) {
     ctx.response.status = 401;
     ctx.response.body = { message: "Unauthorized access is not allowed" };
-    return;
+    return; // Add this return statement
   }
-
   const body = await ctx.request.body.json();
   const { email, password } = body;
 

@@ -1,6 +1,6 @@
 import { Context } from "https://deno.land/x/oak@v16.1.0/mod.ts";
 import { hash } from "https://deno.land/x/scrypt@v4.2.1/mod.ts";
-import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
+import "@std/dotenv/load";
 
 interface UserData {
   uid: string;
@@ -10,7 +10,6 @@ interface UserData {
 }
 
 const userSignup = async (ctx: Context) => {
-  const env = await load();
   const apikeyheader = ctx.request.headers.get("x-api-key");
 
   if (!apikeyheader) {
@@ -19,7 +18,7 @@ const userSignup = async (ctx: Context) => {
     return; // Add this return statement
   }
 
-  const apikeyfromenv = env["API_SECUIRTY_KEY"];
+  const apikeyfromenv = Deno.env.get("API_SECUIRTY_KEY");
   if (apikeyfromenv !== apikeyheader) {
     ctx.response.status = 401;
     ctx.response.body = { message: "Unauthorized access is not allowed" };
