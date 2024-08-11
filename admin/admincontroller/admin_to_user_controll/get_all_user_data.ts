@@ -2,7 +2,6 @@
 
 import {Context} from "https://deno.land/x/oak@v16.1.0/mod.ts"
 import "@std/dotenv/load";
-  
 const get_all_userprofiledata = async(ctx:Context)=>{
  const apikeyheader = ctx.request.headers.get("x-api-key")
   console.log("api key from header",apikeyheader)

@@ -3,7 +3,7 @@ import {hash} from "https://deno.land/x/scrypt@v4.2.1/mod.ts"
 import "@std/dotenv/load";
 
 interface UserProfile{
-uid:string,i
+uid:string,
 username:string,
 firstname:string,
 lastname:string,
