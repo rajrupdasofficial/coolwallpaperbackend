@@ -18,7 +18,14 @@ const updateprofile = async(ctx:Context)=>{
     ctx.response.status = 404
     ctx.response.body = {message:"API Key is missing"}
   }
-  const apikeyfromenv = null
- // {}
+  const apikeyfromenv = Deno.env.get("API_SECUIRTY_KEY")
+console.log(apikeyfromenv)
+if(apikeyfromenv!==apikeyheader){
+    ctx.response.status = 401;
+    ctx.response.body  = {message:"Unauthorize access is not allowed"}
+        return
+}
+
+
 
 }
