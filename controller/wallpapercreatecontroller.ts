@@ -1,5 +1,6 @@
 import { Context } from "https://deno.land/x/oak@v16.1.0/mod.ts";
 import { resolve } from "jsr:@std/path@0.223/posix";
+import uploadappwrite from "../config/convexconfig/appwriteconfig.ts";
 
 const imageupload = async (ctx: Context) => {
   // Set CORS headers
@@ -22,7 +23,7 @@ const imageupload = async (ctx: Context) => {
         console.log("File", field, val);
         const arraybuffer = await val.arrayBuffer();
         const uint8Array = new Uint8Array(arraybuffer);
-        await Deno.writeFile(`images/${val.name}`, uint8Array);
+        uploadappwrite(val);
       } else {
         console.log("Field", field, val);
       }
