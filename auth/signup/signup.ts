@@ -7,7 +7,6 @@ interface UserData {
   username: string;
   email: string;
   password: string;
-  pictureuploadfolderid: string;
 }
 
 const userSignup = async (ctx: Context) => {
@@ -42,13 +41,11 @@ const userSignup = async (ctx: Context) => {
     const hashedPassword = await hash(password);
     // Create user data
     const uid = crypto.randomUUID();
-    const pictureuploadfolderid = crypto.randomUUID();
     const userData: UserData = {
       uid,
       username,
       email,
       password: hashedPassword,
-      pictureuploadfolderid,
     };
 
     // Store user data
