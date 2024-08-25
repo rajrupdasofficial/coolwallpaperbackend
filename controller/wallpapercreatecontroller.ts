@@ -16,6 +16,9 @@ const imageupload = async (ctx: Context) => {
 
   try {
     const reqBody = await ctx.request.body.formData();
+    console.log("reqbodydata", reqBody);
+    const user_uid = reqBody.get("uid") ?? "";
+    console.log("user_uid", user_uid);
     for (const pair of reqBody.entries()) {
       const field = pair[0],
         val = pair[1];
@@ -23,7 +26,17 @@ const imageupload = async (ctx: Context) => {
         console.log("File", field, val);
         const arraybuffer = await val.arrayBuffer();
         const uint8Array = new Uint8Array(arraybuffer);
-        uploadappwrite(val);
+        const uploader = await uploadappwrite(val, user_uid);
+        if (uploader.success) {
+          ctx.response.status = 200;
+          ctx.response.body = { message: "Upload successful" };
+        } else {
+          ctx.response.body = 500;
+          ctx.response.body = {
+            message: "error occurred",
+            data: uploader.error,
+          };
+        }
       } else {
         console.log("Field", field, val);
       }
