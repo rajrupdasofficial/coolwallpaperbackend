@@ -3,6 +3,7 @@ import adminusercreate from "../admincontroller/admin_to_user_profile_controll/u
 import get_all_userprofiledata from "../admincontroller/admin_to_user_profile_controll/get_all_user_profile_data.ts";
 import get_all_stored_users from "../admincontroller/admin_user_controller/get_all_user_data.ts";
 import updateuserdata from "../admincontroller/admin_user_controller/update_user_data.ts";
+import get_all_media_data from "../admincontroller/admin_to_user_media_controller/admin_to_user_all_media_get.ts";
 
 const adminucr = new Router();
 //admin get all signed up user data
@@ -13,4 +14,6 @@ adminucr.post("/api/v1/updateusersdata", updateuserdata);
 adminucr.post("/api/v1/adminucr", adminusercreate);
 //admin retrive all user profile data
 adminucr.get("/api/v1/allupd", get_all_userprofiledata);
+//admin show all of the media to admin dashboard
+adminucr.get("/api/v1/allmedia", get_all_media_data);
 export default adminucr;
